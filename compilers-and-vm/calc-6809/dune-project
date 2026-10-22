@@ -1,4 +1,4 @@
-(lang dune 3.21)
+(lang dune 2.0)
 
 (name calc)
 
@@ -12,8 +12,8 @@
 
 (package
  (name calc)
- (synopsis "Kompilator jezyka CALC")
- (description "Kompilator jezyka CALC (wyrażenia arytmetyczne)")
+ (synopsis "Kompilator jezyka CALC do 6809")
+ (description "Kompilator jezyka CALC (wyrażenia arytmetyczne) na architekturę 6809")
  (depends ocaml))
 
-(using menhir 2.1)
+(using menhir 2.0)

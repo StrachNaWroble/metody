@@ -9,9 +9,15 @@ _build/
 *.a
 *.cmxa
 *.cmxs
+*.out
+*.exe
+a.out
+fib_ocaml
 
 # Logs
 *.log
+utop.log
+utop_success.log
 
 # Editor and OS temporary files
 .DS_Store
