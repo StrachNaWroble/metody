@@ -1,0 +1,72 @@
+ZADANIE 1.
+
+ Wyrażenie:
+  (2 + 3) * (4 - 1)
+ 
+ Kod:
+  [compile (2+3)] @ [compile (4-1)] @ [MMul]
+  [MConst 2; MConst 3; MAdd; MConst 4; MConst 1; MSub; MMul]
+ 
+ Wykonywanie instrukcji:
+  kod: [MConst 2; MConst 3; MAdd; MConst 4; MConst 1; MSub; MMul], stos: []
+  kod: [MConst 3; MAdd; MConst 4; MConst 1; MSub; MMul], stos: [2]
+  kod: [MAdd; MConst 4; MConst 1; MSub; MMul], stos: [3, 2]
+  kod: [MConst 4; MConst 1; MSub; MMul], stos: [5] 
+  kod: [MConst 1; MSub; MMul], stos: [4, 5]
+  kod: [MSub; MMul], stos: [1, 4, 5]
+  kod: [MMul], stos: [3, 5]
+  kod: [], stos: [15]
+  
+ZADANIE 2.
+
+ Maszyna z akumulatorem.
+
+ Wyrażenie:
+  (2 + 3) * (4 - 1)
+
+ Kod:
+  AST: Binop(Mul, Binop(Add, 2, 3), Binop(Sub, 4, 1))
+  
+  [compile env Binop(Add, 2, 3)] @ [MPush] @ [compile (Env.push_tmp env) Binop(Sub, 4, 1)] @ [MMul]
+  [MConst 2; MPush; MConst3; MAdd] @ [MPush] @ [MConst 4; MPush; MConst 1; MSub] @ [MMul]
+  [MConst 2; MPush; MConst 3; MAdd; MPush; MConst 4; MPush; MConst 1; MSub; MMul]
+  
+ Wykonywanie instrukcji:
+  kod: [MConst 2; MPush; MConst 3; MAdd; MPush; MConst 4; MPush; MConst 1; MSub; MMul], acc = None, stos: []
+  kod: [MPush; MConst 3; MAdd; MPush; MConst 4; MPush; MConst 1; MSub; MMul], acc = 2, stos: []
+  kod: [MConst 3; MAdd; MPush; MConst 4; MPush; MConst 1; MSub; MMul], acc = 2, stos: [2]
+  kod: [MAdd; MPush; MConst 4; MPush; MConst 1; MSub; MMul], acc = 3, stos: [2]
+  kod: [MPush; MConst 4; MPush; MConst 1; MSub; MMul], acc = 5, stos: []
+  kod: [MConst 4; MPush; MConst 1; MSub; MMul], acc = 5, stos: [5]
+  kod: [MPush; MConst 1; MSub; MMul], acc = 4, stos: [5]
+  kod: [MConst 1; MSub; MMul], acc = 4, stos: [4, 5]
+  kod: [MSub; MMul], acc = 1, stos: [4, 5]
+  kod: [MMul], acc = 3, stos: [5] -> ściąga górną ze stosu, górna - acc ląduje w acc, a górna znika ze stosu
+  kod: [], acc = 15, stos: [] -> 15
+  
+ZADANIE 3.
+
+module MMap = Map.Make(String)
+
+module Env : sig
+  type t
+
+  val empty    : t
+  val add : t -> Ast.var -> t
+  val push_tmp : t -> t
+  val lookup : t -> Ast.var -> int
+  
+end = struct
+  type t = { map : int MMap.t; depth : int; }
+
+  let empty     = { map = MMap.empty; depth = 0 }
+  let add env x = { map = MMap.add x env.depth env.map; depth = env.depth + 1 }
+  let push_tmp env = { map = env.map; depth = env.depth + 1 } 
+  let lookup env x = 
+  	match MMap.find_opt x env.map with
+  	| Some i -> env.depth - i - 1
+  	| _ -> failwith ("Unbound variable " ^ x) 
+end
+ 
+ZADANIE 4. 
+

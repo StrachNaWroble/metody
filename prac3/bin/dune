@@ -1,0 +1,4 @@
+(executable
+ (public_name prac3)
+ (name main)
+ (libraries prac3))

@@ -1,0 +1,6 @@
+(library
+ (name fun))
+
+(menhir (modules Parser))
+
+(ocamllex Lexer)

@@ -1,0 +1,7 @@
+(library
+ (name while)
+ ( libraries bignum ))
+
+(menhir (modules Parser))
+
+(ocamllex Lexer)

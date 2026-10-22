@@ -1,0 +1,13 @@
+(lang dune 2.0)
+
+(name prac3)
+
+(generate_opam_files true)
+
+(package
+ (name prac3)
+ (synopsis "Szablon rozwiązania pracowni 3 z Metod Programowania")
+ (description "Szablon rozwiązania pracowni 3 z Metod Programowania")
+ (depends ocaml))
+
+(using menhir 2.0)

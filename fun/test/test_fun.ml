@@ -1,0 +1,1 @@
+def rec dodaj_wiele x y z = if x == 0 then y + z else dodaj_wiele (x - 1) y (z + 1)

@@ -1,0 +1,4 @@
+def rec fib_fun n =
+    if n == 0 then 0
+    else if n == 1 then 1
+    else fib_fun (n-1) + fib_fun (n-2)

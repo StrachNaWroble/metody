@@ -1,0 +1,19 @@
+(lang dune 2.0)
+
+(name tcalc)
+
+(generate_opam_files true)
+
+(authors
+  "Maciej Piróg <mpirog@cs.uni.wroc.pl>"
+  "Piotr Polesiuk <ppolesiuk@cs.uni.wroc.pl>")
+
+(license "MIT")
+
+(package
+ (name tcalc)
+ (synopsis "Interpreter typowanego języka")
+ (description "Interpreter typowanego języka")
+ (depends ocaml))
+
+(using menhir 2.0)

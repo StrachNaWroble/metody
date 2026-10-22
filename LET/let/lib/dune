@@ -1,0 +1,7 @@
+(library
+ (name let)
+ (libraries utop))
+
+(menhir (modules Parser))
+
+(ocamllex Lexer)

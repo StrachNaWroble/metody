@@ -1,0 +1,22 @@
+(lang dune 2.9)
+
+(name let)
+
+(generate_opam_files true)
+
+(source
+ (github username/reponame))
+
+(authors "Maciej Piróg <mpirog@cs.uni.wroc.pl>")
+
+(license "MIT")
+
+(package
+ (name let)
+ (synopsis "Interpreter jezyka LET")
+ (description "Interpreter jezyka LET")
+ (depends ocaml))
+
+; See the complete stanza docs at https://dune.readthedocs.io/en/stable/reference/dune-project/index.html
+
+ (using menhir 2.1)

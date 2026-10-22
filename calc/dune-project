@@ -1,0 +1,16 @@
+(lang dune 2.9)
+
+(name calc)
+
+(generate_opam_files true)
+
+(source
+ (github username/reponame))
+
+(package
+ (name calc)
+ (synopsis "Interpreter jezyka CALC")
+ (description "Interpreter jezyka CALC (wyrażenia arytmetyczne)")
+ (depends ocaml))
+
+ (using menhir 2.1)

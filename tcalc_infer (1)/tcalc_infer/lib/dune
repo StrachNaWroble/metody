@@ -1,0 +1,6 @@
+(library
+ (name tCalc))
+
+(menhir (modules Parser))
+
+(ocamllex Lexer)

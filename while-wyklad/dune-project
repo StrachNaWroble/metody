@@ -1,0 +1,22 @@
+(lang dune 2.0)
+
+(name while)
+
+(generate_opam_files true)
+
+(source
+ (github username/reponame))
+
+(authors "Maciej Piróg <mpirog@cs.uni.wroc.pl>")
+
+(license "MIT")
+
+(package
+ (name while)
+ (synopsis "Interpreter jezyka WHILE")
+ (description "Interpreter jezyka WHILE")
+ (depends ocaml))
+
+; See the complete stanza docs at https://dune.readthedocs.io/en/stable/reference/dune-project/index.html
+
+ (using menhir 2.0)

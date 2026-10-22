@@ -1,0 +1,175 @@
+ZADANIE 1
+
+let rec fib n =
+  if n = 0 then 0
+  else if n = 1 then 1
+  else (fib (n-1)) + (fib (n-2));;
+  
+let fib_iter n =
+	if n == 0 then 0 else 
+	let rec it i a b =
+		if i = n-1 then (max a b)
+		else if a > b then (it (i+1) a (a+b))
+		else (it (i+1) (a+b) b)
+	in it 0 0 1;;
+		
+		
+mierzenie czasu: 
+let t = Sys.time () in
+let w_rec = fib_fast 35 in
+let delta = Sys.time () -. t in
+Printf.printf "czas: %f" delta;
+w_rec;;
+
+dla 35:
+dla rekurencji --> 0.759511
+dla iteracji --> 0.000004
+
+dla fib_matrix --> 0.000010
+dla fib_fast --> 0.000007
+
+dal dużych danych fib_fast zdecydowanie najszybszy
+35000
+iter --> 0.001196
+fast --> 0.000006
+
+
+ZADANIE 2
+
+let matrix_mult m n =
+let x1, x2, x3, x4 = m and y1, y2, y3, y4 = n
+in (x1*y1+x2*y3, x1*y2+x2*y4, x3*y1+x4*y3, x3*y2+x4*y4);;
+
+let matrix_id = (1, 0, 0, 1);;
+
+let matrix_expt m k = 
+    let rec it i copy = 
+        if i = k-1 then copy
+        else (it (i+1) (matrix_mult copy m)) 
+    in it 0 m;;
+
+let fib_matrix n = 
+  let x1, x2, x3, x4 = matrix_expt (1, 1, 1, 0) n in
+  x1;;
+
+
+ZADANIE 3
+
+let matrix_exp_fast m k =
+let rec pot i m1 acc = 
+    if i = 0 then acc else 
+    if i mod 2 = 0 then pot (i/2) (matrix_mult m1 m1) acc else
+    pot (i-1) m1 (matrix_mult acc m1)
+  in pot k m matrix_id;; 
+
+let fib_fast n =
+    let x1, x2, x3, x4 = matrix_exp_fast (1, 1, 1, 0) n
+    in x2;;
+
+ZADANIE 4
+
+let mem x xs =
+    let rec it lista = 
+        if lista = [] then false else
+        if (List.hd lista) = x then true else
+        it (List.tl lista)
+    in it xs;;
+    
+ZADANIE 5
+
+let maximum xs = 
+    let rec it lista maxx =
+        if lista = [] then maxx else
+        if (List.hd lista) > maxx then it (List.tl lista) (List.hd lista) else
+        it (List.tl lista) maxx
+    in it xs neg_infinity;; 
+
+let maximum xs = 
+    let rec it lista maxx =
+    	match lista with 
+    	| [] -> maxx
+        | head :: tail -> if head > maxx then it tail head 
+    in it xs neg_infinity;;
+
+ZADANIE 6
+let suffixes xs = 
+    let rec it lista acc = 
+        match lista with 
+        | [] -> [] :: acc
+        | head :: tail -> it tail (lista :: acc)
+    in (List.rev (it xs []) );;
+
+ZADANIE 7
+let is_sorted xs = 
+    let rec it a lista =
+        match lista with
+        | [] -> return true
+        | head :: tail -> if head < a then false
+                          else it head tail
+    in it (List.hd xs) (List.tl xs);;
+
+ZADANIE 8
+let select xs = 
+if xs = [] then (0, []) else 
+
+    let rec it lista mini = 
+        match lista with 
+        | [] -> mini
+        | head :: tail -> if head < mini then it tail head
+                          else it tail mini
+    in let minimum = it xs (List.hd xs) in 
+
+    let rec filtruj lista minimum acc check = 
+        match lista with
+        | [] -> (minimum, acc)
+        | head :: tail -> 
+                         if (head = minimum && check = 0)
+                             then filtruj tail minimum acc 1
+                         else filtruj tail minimum (head :: acc) check
+    in filtruj xs minimum [] 0;;
+
+
+let select_sort xs = 
+    let rec sort lista acc = 
+       match lista with 
+       | [] -> acc
+       | _ -> let (mini, rest) = select lista in 
+                                sort rest (mini :: acc)
+    in (List.rev (sort xs []));;
+
+
+ZADANIE 9
+
+let split xs = 
+  let polowa = ((List.length xs)/2) in 
+    let rec it polowa lista l p = 
+      match lista with
+      | [] -> (l, p)
+      | head :: tail -> if polowa > 0 then it (polowa-1) tail (head :: l) p
+                        else it (polowa-1) tail l (head :: p)
+    in it polowa xs [] [];;
+ 
+let merge l p = 
+  let rec it lewa prawa acc = 
+     match lewa, prawa with 
+     | [], [] -> acc
+     | [], p_h :: p_t -> it lewa p_t (p_h :: acc)
+     | l_h :: l_t, [] -> it l_t prawa (l_h :: acc)
+     | l_h :: l_t, p_h :: p_t -> if l_h < p_h then it l_t prawa (l_h :: acc)
+                                 else it lewa p_t (p_h :: acc)
+     in (List.rev ( it l p []) );;
+
+let rec merge_sort xs =
+   match xs with
+   | [] -> []
+   | [x] -> [x]
+   | _ -> let (l, p) = split xs in
+          let l_res = merge_sort l and p_res = merge_sort p
+            in merge l_res p_res;; 
+
+
+
+
+
+
+

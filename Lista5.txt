@@ -1,0 +1,85 @@
+ZADANIE 1. (A, M, P, B)
+
+S -> A
+A -> A + M | A - M | M
+M -> M * P | M / P | P
+P -> B ^ P | B
+B -> n | (A)
+
+
+ZADANIE 2. 
+
+P =
+	S -> (S)S
+	S -> (S
+	S -> e
+	
+Może np. dla (() : nie wiadomo który nawias zamyka ostatni ')' interpretacje:
+1. 
+if 
+{
+	if 
+	else 
+}
+
+	S
+   /|
+  ( S
+   /|\ \
+  ( S ) S
+	|   |
+	e   e
+	
+2.
+if 
+{
+	if
+}
+else
+
+    S
+   /|\ \
+  ( S ) S
+   /|   |
+  ( S   e
+	|
+	e
+	
+dobra gramatyka (jednoznaczna):
+
+s -> Z | O
+Z -> (Z) Z | e
+O -> (S | (Z) O
+
+
+
+ZADANIE 3.
+
+destruktor -> służy do wyciągnięcia informacji z typu
+
+unit = () nie zwraca niczego, więc nie ma czego wyciągać, nie przechowuje informacji
+
+Ast.ml -> dodanie | Unit
+Lexer -> nie ma potrzeby, bo już rozpoznaje ( ) jako LPAR RPAR
+Parser -> | LPAR; RPAR { Unit } rozpoznawanie nawiasów jako Unit
+Eval -> dodanie w value | VUnit
+ 		dodanie show_value | VUnit -> "()"
+ 		dodanie w eval | Unit -> VUnit
+ 		
+ZADANIE 4.
+
+ 		
+
+
+
+
+
+
+
+
+
+
+
+
+
+

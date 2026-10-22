@@ -1,0 +1,22 @@
+# Dune and OCaml build artifacts
+_build/
+*.install
+*.merlin
+*.cmo
+*.cmi
+*.cmx
+*.o
+*.a
+*.cmxa
+*.cmxs
+
+# Logs
+*.log
+
+# Editor and OS temporary files
+.DS_Store
+__MACOSX/
+*.swp
+*~
+.vscode/
+.idea/

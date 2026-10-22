@@ -1,0 +1,225 @@
+ZADANIE 1
+
+let rec map f xs =
+  match xs with
+  | [] -> []
+  | y :: ys -> f y :: map f ys
+
+Tw.
+map f (map g xs) = map (fun x -> f (g x)) xs.
+
+    1. baza indukcji: weźmy listę pustą i pokażmy że Tw. zachodzi dla []
+        L = map f (map g []) = map f [] = [] 
+        P = map (fun x -> f (g x)) [] = dowolna fukncja dla [] -> []  
+        L = P
+    2. krok indukcyjny: weźmy dowolną listę niepustą xs i element x i pokażmy, że Tw. zachodzi dla xs' = x :: xs
+    - czyli mamy, że zachodzi: map f (map g xs) = map (fun x -> f (g x)) xs
+        L = map f (map g x::xs) = map f (g x :: map g xs) = f (g x) :: map f (map g xs) = f (g x) :: map (fun x -> f (g x)) xs
+        P = map (fun x -> f (g x)) x::xs = (fun x -> f (g x)) x :: map (fun f (g x)) xs = f (g x) :: map (fun x -> f (g x)) xs
+        L = P 
+    Więc Tw. zachodzi na mocy indukcji strukturalnej 
+
+ZADANIE 2
+
+let rec append xs ys =
+  match xs with
+  | [] -> ys
+  | x :: xs' -> x :: append xs' ys
+
+Tw. dowolnych list xs i ys istnieje lista zs taka, że append xs ys ≡ zs
+
+(indukcja po liście xs)
+
+    1. baza indukcji: weźmy xs = [] i pokazmy, że append xs ys = zs jest wartością
+    append [] ys = ys, więc istnieje zs = ys które jest wartością
+    2. krok indukcyjny: weźmy dowolne xs = x :: xs' i pokażmy że jeśli Tw. zachodzi dla xs' to zachodzi też dla xs
+    append xs ys = append x::xs ys = x :: append xs' ys = (z zał. ind. dla append xs' ys istnieje zs'=xs'::ys) = x :: zwartośćs' = zs
+
+Więc na mocy indukcji dla dowolnych xs i ys zachodzi Tw. 
+
+ZADANIE 3
+
+type 'v nnf =
+    | NNFLit of bool * 'v
+    | NNFConj of 'v nnf * 'v nnf
+    | NNFDisj of 'v nnf * 'v nnf
+
+Zasada indukcji dla tego typu danych:
+
+Dla każdej własności P wartości typu 'v nnf 
+    - jeśli dla dowolnej wartości b typu bool i zmiennej v typu 'v zachodzi P(NNFLit(b, v)) oraz
+    - jeśli dla dowolnych dwóch podformuł typu 'v nnf: p' i p'' 
+        - z zał. P(p') oraz P(p'') ==> zachodzi P(NNFConj(p', p'')) oraz
+        - z zał. P(p') oraz P(p'') ==> zachodzi P(NNFDisj(p', p''))
+    to dla każdej formuły p zachodzi P.
+    
+ZADANIE 4
+
+let rec neg_nnf p = 
+  match p with 
+  | NNFLit (b, v) -> NNFLit(not b, v)
+  | NNFConj (p', p'') -> NNFDisj( neg_nnf p', neg_nnf p'')
+  | NNFDisj (p', p'') -> NNFConj( neg_nnf p', neg_nnf p'')
+;;  
+
+let phi = NNFDisj (NNFLit(true, "p"),  NNFLit(true, "q"))
+
+Udowodnić twierdzenie P: neg_nnf (neg_nnf p) = p
+
+    1. baza indukcji: weźmy dowolną zmienną x typu NNFLit (b, v)
+        neg_nnf (neg_nnf NNFLit(b, v)) = neg_nnf NNFLit(not b, v) = x 
+    2. krok indukcji - AND : weźmy dowolne formuły p' i p'' i zał. że P(p') oraz P(p'') pokażmy że P(NNFConj(p', p'')) 
+        neg_nnf (neg_nnf NNFConj(p', p'')) = neg_nnf (NNFDisj(neg_nnf p', neg_nnf p'')) = 
+        = NNFConj (neg_nnf (neg_nn p'),  neg_nnf (neg_nnf(p''))) = (z zał. ind. neg_nnf (neg_nn p') = p' , więc) =
+        = NNFConj (p', p'')
+    3. krok indukcji - OR : P(p') i P(p'') ==> P(NNFDisj(p', p''))
+        neg_nnf (neg_nnf NNFDisj(p', p'')) = neg_nnf (NNFConj(neg_nnf p', neg_nnf p'')) = 
+        = NNFDisj(neg_nnf (neg_nnf p'), neg_nnf (neg_nnf p'')) = NNFDisj(p', p'') 
+Więc na mocy indukcji zdefiniowanej w zadaniu 3. zachodzi P(p) dla dowolnej formuły p. 
+
+
+ZADANIE 5
+
+b - czy zmienna jest zanegowana
+
+let rec eval_nnf d p = 
+  match p with
+  | NNFLit (b, v) -> if b = true then not (d v) else (d v)
+  | NNFConj(p', p'') -> eval_nnf d p' && eval_nnf d p''
+  | NNFDisj(p', p'') -> eval_nnf d p' || eval_nnf d p''
+;;
+
+
+Tw. P(d, p) = Dla dowolnej formuły p i wartościowania d zachodzi eval_nnf d (neg_nnf p) ≡ not (eval_nnf d p).
+
+    1. baza indukcji: weźmy dowolną zmienną NNFLit(b, v), czy zachodzi dla niej P?
+        - niech b = true:
+            L = eval_nnf d (neg_nnf NNFLit(true, v)) = eval_nnf d NNFLit(false, v) = d v 
+            P = not (eval_nnf d NNFLit(true, v)) = not (not d v) = d v
+        - niech b = false:
+            L = eval_nnf d (neg_nnf NNFLit(false, v)) = eval_nnf d NNFLit(true, v) = not (d v)
+            P = not (eval_nnf d NNFLit(false, v)) = not (d v)
+    2. Krok ind. weźmy dowolne p' i p'' i zał. że P(p') oraz P(p'')
+        - pokażmy, że P(NNFConj(p', p'')) zachodzi:
+            L = eval_nnf d (neg_nnf NNFConj(p', p'')) = eval_nnf d (NNFDisj(nnf_neg p', nnf_neg p'')) = 
+            = eval_nnf d (neg_nnf p') || eval_nnf d (neg_nnf p'') = zał. ind. = not (eval d p') || not (eval d p'')
+            P = not (eval_nnf d NNFConj(p', p'')) = not (eval_nnf p' && eval_nnf p'') = not (eval d p') or not (eval d p'')
+        - pokażmy, że P(NNFDIsj(p', p'')) zachodzi:
+            L = eval_nnf d (neg_nnf NNFDisj(p', p'')) = eval_nnf d (NNFConj(nnf_neg p', nnf_neg p'')) = 
+            = eval_nnf d (neg_nnf p') && eval_nnf d (neg_nnf p'') = zał. ind. = not eval d p' && not eval d p''
+            P = not (eval_nnf d NNFDisj(p', p'')) = not (eval_nnf p' || eval_nnf p'') = eval_nnf p' && eval_nnf p'' = L 
+
+    Więc na mocy indukcji z zadania 3. zachodzi P. 
+
+ZADANIE 6
+
+type 'v formula =
+| Var of 'v
+| Neg of 'v formula
+| Conj of 'v formula * 'v formula
+| Disj of 'v formula * 'v formula
+
+
+let to_nnf p = 
+  let rec it p flaga = 
+    match p with 
+    | Var v -> NNFLit (flaga, v)
+    | Neg v -> it p (not flaga)
+    | Conj (p', p'') -> 
+        if flaga = true then NNFDisj (it p' true, it p'' true)
+        else NNFConj (it p' false, it p'' false)
+    | Disj (p', p'') ->
+        if flaga = true then NNFConj (it p' true, it p'' true)
+        else NNFDisj (it p' false, it p'' false)
+    in it p false
+
+
+ZADANIE 7
+
+let rec eval_formula d p =
+  match p with 
+  | Var v -> d v
+  | Conj (p', p'') -> eval_formula d p' && eval_formula d p''
+  | Disj (p', p'') -> eval_formula d p' || eval_formula d p''
+  | Neg v -> not (eval_formula d v) 
+
+
+z poprzedniego
+***
+let rec eval_nnf d p = 
+  match p with
+  | NNFLit (b, v) -> if b = true then not (d v) else (d v)
+  | NNFConj(p', p'') -> eval_nnf d p' && eval_nnf d p''
+  | NNFDisj(p', p'') -> eval_nnf d p' || eval_nnf d p''
+;;
+***
+
+Tw. eval_nnf d (to_nnf p) ≡ eval_formula d p 
+
+udowodnijmy lemat pomocniczy:
+    LEMAT -> eval_nnf d (it p false) = eval_formula d p
+        oraz eval_nnf d (it p true) = not (eval_formula d p)
+
+    1. baza indukcji: P(Var v) zachodzi
+        jeśli flaga = false
+        L = eval_nnf d (it p false) = eval_nnf d NNFLit(false, v) = d v 
+        P = eval_formula d Var(v) = d v 
+
+        jeśli flaga = true
+        L = eval_nnf d (it p true) = eval_nnf d NNFLit(true, v) = not (d v)
+        P = not (eval_formula d Var(v)) = not (d v)
+
+    2. krok indukcji: zał. że P(p') oraz P(p'')
+
+        jeśli flaga = false, pokażmy że P( Neg(p') )
+        L = eval_nnf d (it Neg(p') false) = eval_nnf d (it p' true) = z zał. ind = not (eval_formula d p') = P
+
+        jeśli flaga = true, pokażmy że P( Neg(p') )
+        L = eval_nnf d (it Neg(p') true) = eval_nnf d (it p' false) = z zał. ind = eval_formula d p' = P
+
+        Jeśli flaga = false, pokażmy, że P( Conj(p', p''))
+        L = eval_nnf d (it (Conj(p', p'')) false) = eval_nnf d (NNFConj (it p' false, it p'' false)) = 
+        = eval_nnf d (it p' false) && eval_nnf d (it p'' false) = z zał ind. = eval_formula d p' && eval_formula d p''
+        P = eval_formula d Conj(p', p'') = eval_formula d p' && eval_formula d p'' = L
+
+        Jeśli flaga = true, pokażmy, ze P( Disj(p', p''))
+        L = eval_nnf d (it Conj(p', p'') true) = eval_nnf d (NNFDisj (it p' true, it p'' true) ) = 
+        = eval_nnf d (it p' true) || eval_nnf (it p'' true) = z zał ind. = not (eval_formula d p') || not (eval_formula d p'')
+        P = not (eval_formula d Conj(p', p'')) = not (eval_formula d p' && eval_formula d p'') = 
+        not eval_formula d p' || not eval_formula d p'' = L 
+
+        Analogicznie dla P (Disj(p', p''))
+    Wiec LEMAT zachodzi
+
+Tw. eval_nnf d (to_nnf p) ≡ eval_formula d p
+
+mamy: eval_nnf d (to_nnf p) = eval_nnf d (it p false) = z LEMATU = eval_formula d p 
+Więc tw. zachodzi
+
+
+ZADANIE 8
+
+let rec is_sorted xs =
+  match xs with
+  | [] -> true
+  | [x] -> true
+  | x :: y :: ys -> x <= y && is_sorted (y :: ys)
+
+let rec insert a xs =
+  match xs with
+  | [] -> [a]
+  | x :: xs' -> 
+      if a <= x then a :: x :: xs'
+      else x :: insert a xs'
+
+
+Tw. P(xs) = (jeśli is_sorted (xs) = true ==> is_sorted (insert a xs) = true)
+
+1. baza indukcji: weźmy xs = [] i zał. że is_sorted([]) = true
+    wtedy insert a [] = [a] oraz is_sorted [a] z def. = true
+
+2. krok ind. : zał że xs = x::xs' i P(xs') zachodzi, pokażmy że P(xs), czyli is_sorted (insert a (x::xs')) = 
+
+
+
+

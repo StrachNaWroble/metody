@@ -1,0 +1,18 @@
+a = 10;
+b = 20;
+a += b;
+print(a);
+
+if (a == b)
+{
+    print("A");
+    halt;
+}
+print("waaa");
+
+if (true)
+    print("TAK");
+if (false)
+    print("NIE");
+else 
+    print("OK");

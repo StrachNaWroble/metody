@@ -1,0 +1,196 @@
+ZADANIE 1
+let inc a = a + 1;;
+let sqare a = a * a;;
+let compose f g x = (f (g x) );;
+
+
+ZADANIE 2
+
+List.length ( fold_right_rev ( List.init 10000 Fun.id ) )
+
+Polecenie wykonuje się nieproporcjonalnie długo do rozmiaru listy. 
+Operacja @ działa w czasie O(n^2) ponieważ za każdym razem kopiuje całą dotychczasową listę. 
+
+Wykona się (n? = 1+2+...+n = (n*(n-1)/2) konsolidacji dla listy dlogości n. Czyli dla 10000 = 49985000
+
+ZADANIE 3
+
+type 'a tree = Leaf | Node of 'a tree * 'a * 'a tree;;
+
+let rec fold_tree f a t =
+  match t with
+  | Leaf -> a
+  | Node (l, v, r) -> f (fold_tree f a l) v (fold_tree f a r);;
+
+let drzewko = Node (
+Node (Leaf, 1, Leaf), 2, Node(Leaf, 4, Leaf) ) ;;
+
+let drzewo = Node (
+Node (Leaf, 1, Leaf), 2, Node(Node (Leaf, 4, Leaf), 10, Node (Leaf, 44, Leaf)) ) ;;
+
+
+ROZW:
+1) let tree_product t = fold_tree (fun vl v vr -> vl * v * vr) 1 t ;;
+
+2) let tree_flip t = fold_tree (fun vl v vr -> Node (vr, v, vl)) Leaf t;;
+
+3) let tree_height t = fold_tree (fun vl v vr -> ((max vl vr) + 1) ) 1 t;;
+
+4) 
+let find vl v vr =
+  let minimum = 
+    match vl with
+      | None -> v
+      | Some (l', p') -> l'
+  in let maximum = 
+    match vr with
+    | None -> v
+    | Some (l', p') -> p'
+  in Some (minimum, maximum);;
+
+let tree_span t = fold_tree find None t;;
+
+5) let flatten t = fold_tree (fun vl v vr -> vl @ [v] @ vr) [] t;;
+
+
+ZADANIE 4
+
+let rec flat_append t xs = 
+	match t with
+	| Leaf -> xs
+	| Node (vl, v, vr) -> 
+	  let r = flat_append vr xs in
+	  let v_r = v :: r in
+	  flat_append vl v_r;;
+	  
+let tree_flatten t = flat_append t [];;
+
+
+ZADANIE 5
+
+5 -> 2
+  -> 8 -> 6
+       -> 9
+       
+po remove 8
+
+5 -> 2 
+  -> 6 -> 9
+  
+ZADANIE 6
+
+module DictList : DICT = struct 
+type ('a, 'b) dict = ('a * 'b) list
+let empty = []
+let insert a b d = (a, b) :: d
+let remove a d = List.filter (fun (ap, bp) -> ap <> a) d
+
+let rec find_opt a d = 
+    match d with 
+    | [] -> None
+    | (ap, bp) :: rest ->
+        if ap = a then Some bp
+        else find_opt a rest
+        
+let rec find a d =
+    match find_opt a d with 
+    | Some b -> b
+    | None -> failwith "Nie ma takiej wartosci"
+    
+let to_list d = d
+end 
+;;
+
+
+ZADANIE 7
+
+module TreeDict : DICT = struct
+type ('a, 'b) dict = 
+    | Leaf 
+    | Node of ('a, 'b) dict * 'a * 'b * ('a, 'b) dict
+    
+let empty = Leaf
+
+let rec insert a b d = 
+    match d with
+    | Leaf -> Node (Leaf, a, b, Leaf)
+    | Node (vl, ap, bp, vr) ->
+        if ap = a then Node (vl, ap, b, vr) else
+        if ap > a then Node (vl, ap, bp, insert a b vr) else 
+        Node (insert a b vl, ap, bp, vr)
+        
+let rec find_opt a d = 
+    match d with 
+    | Leaf -> None
+    | Node (vl, ap, bp, vr) ->
+        if a = ap then Some bp else
+        if ap > a then find_opt a vr else
+        find_opt a vl 
+
+let find a d = 
+    match find_opt a d with
+    | None -> failwith "Nie ma takiej wartosci"
+    | Some b -> b
+
+let rec append d acc = 
+    match d with 
+    | Leaf -> acc
+    | Node (vl, a, b, vr) -> 
+        let r = append vr acc in
+        let ab_r = (a, b) :: r in
+        append vl ab_r
+
+let to_list d = append d []
+
+let rec min_node d = 
+    match d with 
+    | Leaf -> failwith "nie może być takiej sytuacji"
+    | Node (Leaf, a, b, _) -> (a, b)
+    | Node (vl, _, _, _) -> min_node vl
+
+let rec remove a d = 
+    match d with
+    | Leaf -> Leaf
+    | Node (vl, ap, bp, vr) ->
+        if ap > a then Node (remove a vl, ap, bp, vr)
+        else if ap < a then Node (vl, ap, bp, remove a vr)
+        else 
+            match vl, vr with
+            | Leaf, rest -> rest
+            | rest, Leaf -> rest
+            | _ -> 
+                let (new_a, new_b) = min_node vr in 
+                Node (vl, new_a, new_b, remove new_a vr)
+end 
+;;
+
+
+ZADANIE 8
+
+module Freq (D : DICT) = struct
+let freq (xs : 'a list) : ('a * int) list =
+    let rec it a d =
+    match a with
+    | [] -> D.to_list d
+    | head :: tail ->
+        match (D.find_opt head d) with
+        | None -> it tail (D.insert head 1 d)
+        | Some b -> it tail (D.insert head (b+1) d)
+    in it xs D.empty
+
+let list_of_string s = String.to_seq s |> List.of_seq
+
+let char_freq s = 
+	freq (list_of_string s)
+		
+end
+;;
+
+
+
+
+
+
+
+
+

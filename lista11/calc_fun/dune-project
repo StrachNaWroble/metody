@@ -1,0 +1,19 @@
+(lang dune 3.21)
+
+(name calc)
+
+(generate_opam_files true)
+
+(authors
+  "Maciej Piróg <mpirog@cs.uni.wroc.pl>"
+  "Piotr Polesiuk <ppolesiuk@cs.uni.wroc.pl>")
+
+(license "MIT")
+
+(package
+ (name calc)
+ (synopsis "Kompilator jezyka CALC")
+ (description "Kompilator jezyka CALC (wyrażenia arytmetyczne)")
+ (depends ocaml))
+
+(using menhir 2.1)

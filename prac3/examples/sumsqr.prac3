@@ -1,0 +1,13 @@
+let fold(f : (int, int) -> int, acc : int, i : int) : int =
+  fold(f, f(acc, i), i+1);
+
+let sumsqr(n : int) : int =
+  fold(
+    fun (sum : int, i : int) -> int =
+      if i > n then return[1] sum : int
+      else sum + i*i,
+    0,
+    1);
+
+read n;
+sumsqr(n)
